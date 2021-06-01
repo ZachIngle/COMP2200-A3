@@ -3,6 +3,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 abstract class Stage extends Event {
+    protected String name;
+
     protected int avgProcessingTime;
     protected int rangeProcessingTime;
     protected Item currentItem;
@@ -41,7 +43,6 @@ abstract class Stage extends Event {
         this.blocked = blocked;
     }
 
-
     public void addUnstarvedTime(double time) {
         unstarvedTimes.add(time);
     }
@@ -71,10 +72,23 @@ abstract class Stage extends Event {
     }
 
     public double getTotalTimeStarved() {
-        return 0;
+        if (starvedTimes.size() == 0) return 0;
+        int smallerSize = starvedTimes.size() < unstarvedTimes.size() ? starvedTimes.size() : unstarvedTimes.size();
+
+        Double[] starvedArray = starvedTimes.toArray(new Double[starvedTimes.size()]);
+        Double[] unstarvedArray = unstarvedTimes.toArray(new Double[unstarvedTimes.size()]);
+
+        double total = 0;
+        for (int i = 0; i < smallerSize; i++) {
+            //System.out.println(starvedArray[i] - unstarvedArray[i]);
+            total += unstarvedArray[i] - starvedArray[i];
+        }
+
+        return total;
     }
 
     public double getTotalTimeBlocked() {
+        if (blockedTimes.size() == 0) return 0;
         int smallerSize = blockedTimes.size() < unblockedTimes.size() ? blockedTimes.size() : unblockedTimes.size();
 
         Double[] blockedArray = blockedTimes.toArray(new Double[blockedTimes.size()]);
@@ -90,7 +104,7 @@ abstract class Stage extends Event {
     }
 
     public double getWorkPercentage(double timeLimit) {
-        return 100 - (getTotalTimeStarved() + getTotalTimeBlocked() / timeLimit * 100);
+        return 100 - ((getTotalTimeStarved() + getTotalTimeBlocked()) / timeLimit * 100);
     }
 
     protected double productionTime() {

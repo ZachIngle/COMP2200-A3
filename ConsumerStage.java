@@ -1,12 +1,15 @@
+import java.util.ArrayList;
+
 public class ConsumerStage extends Stage{
-    private int totalItemsConsumed = 0;
+    private ArrayList<Item> finishedItems = new ArrayList<>();
 
     public ConsumerStage(String name, int M, int N) {
         super(name, M, N);
+        starvedTimes.add(0.0);
     }
 
-    public int getTotalItemsConsumed() {
-        return totalItemsConsumed;
+    public ArrayList<Item> getFinishedItems() {
+        return finishedItems;
     }
 
     @Override
@@ -20,15 +23,18 @@ public class ConsumerStage extends Stage{
                 message = "Starved";
             } else {
                 currentItem = source.pollFromQueue(sim);
+                currentItem.addMilestone(time, name, Item.Info.ENTERED);
                 time = sim.currentTime() + productionTime();
+                currentItem.addMilestone(time, name, Item.Info.WORKED);
                 message = "Worked!";
-                sim.insert(this);
             }
         } else {
+            currentItem.addMilestone(time, name, Item.Info.LEFT);
+            finishedItems.add(currentItem);
             currentItem = null;
-            totalItemsConsumed++;
             message = "Consumed!";
-            sim.insert(this);
         }
+
+        sim.insert(this);
     }
 }

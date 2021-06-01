@@ -13,6 +13,14 @@ abstract class Event implements Comparable<Event> {
         return time;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
     @Override
     public int compareTo(Event e) {
         if (time < e.getTime()) {

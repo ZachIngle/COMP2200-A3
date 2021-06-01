@@ -20,14 +20,16 @@ public class ProducerStage extends Stage {
         } else if (currentItem == null) {
             time = sim.currentTime() + productionTime();
             currentItem = new Item();
+            currentItem.addMilestone(time, name, Item.Info.CREATED);
             message = "Created new item";
             totalItemsCreated++;
-            sim.insert(this);
         } else {
+            currentItem.addMilestone(time, name, Item.Info.LEFT);
             destination.pushToQueue(sim, currentItem);
             message = "Pushed";
             currentItem = null;
-            sim.insert(this);
         }
+
+        sim.insert(this);
     }
 }
