@@ -22,13 +22,15 @@ public class ProductionLineSimulator {
     }
 
     public void insert(Event e) {
-        events.add(e);
+        if (!events.contains(e)) {
+            events.add(e);
+        }
     }
 
     public void start() {
-        ProducerStage S0 = new ProducerStage(avgProcessingTime, rangeProcessingTime);
+        ProducerStage S0 = new ProducerStage("S0", avgProcessingTime, rangeProcessingTime);
         Storage Q01 = new Storage(storageCapacity);
-        ConsumerStage S5 = new ConsumerStage(avgProcessingTime, rangeProcessingTime);
+        ConsumerStage S5 = new ConsumerStage("S5", avgProcessingTime, rangeProcessingTime);
 
         S0.setDestination(Q01);
 
@@ -44,12 +46,15 @@ public class ProductionLineSimulator {
 
         insert(S0);
         simulate();
+        System.out.println("Total items: " + S5.getTotal());
+        System.out.println("S0 total time blocked = " + S0.getTotalTimeBlocked());
     }
 
     private void simulate() {
         Event e;
         while ((e = events.poll()) != null && time < timeLimit) {
             time = e.getTime();
+            //System.out.format("[%8.0f] %3s: %s\n", time, e.name, e.message);
             e.execute(this);
         }
     }

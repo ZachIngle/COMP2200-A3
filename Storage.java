@@ -40,28 +40,40 @@ public class Storage {
             return;
         }
 
+        queue.add(i);
+
+        // Check destinations incase they are starved
         for (Stage destination : destinations) {
-            if (destination.isReady()) {
-                System.out.println("Storage inserting into at " + sim.currentTime());
-                destination.insertItem(sim, i);
+            if (destination.isStarved()) {
                 destination.setStarved(false);
-                return;
+                destination.addUnstarvedTime(sim.currentTime());
+                sim.insert(destination);
             }
         }
 
-        queue.add(i);
-        System.out.println("Item added to queue. Queue size " + queue.size());
+        for (Stage destination : destinations) {
+            if (destination.isReady()) {
+                sim.insert(destination);
+                //destination.insertItem(sim, i);
+                //System.out.println("Storage inserting into at " + sim.currentTime());
+                break;
+            }
+        }
+
+        //System.out.println("Item added to queue. Queue size " + queue.size());
     }
 
     public Item pollFromQueue(ProductionLineSimulator sim) {
+        // Check sources incase they are blocked
         for (Stage source : sources) {
-            if (source.getBlocked()) {
+            if (source.isBlocked()) {
                 source.setBlocked(false);
+                source.addUnblockedTime(sim.currentTime());
                 sim.insert(source);
             }
         }
 
-        System.out.println("Item removed from queue. Queue size " + (queue.size() - 1));
+        //System.out.println("Item removed from queue. Queue size " + (queue.size() - 1));
         return queue.poll();
     }
 }

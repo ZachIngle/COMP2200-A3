@@ -1,27 +1,21 @@
 public class ProducerStage extends Stage {
-    UIDGenerator gen = UIDGenerator.getInstance();
-
-    public ProducerStage(int M, int N) {
-        super(M, N);
+    public ProducerStage(String name, int M, int N) {
+        super(name, M, N);
     }
 
     @Override
     public void execute(ProductionLineSimulator sim) {
-        if (!destination.isFull()) {
-            blocked = false;
-        } else {
-            blocked = true;
-        }
+        if (blocked) return;
 
-        if (blocked) {
-            time = sim.currentTime();
-            blockedTimes.add(time);
+        if (destination.isFull()) {
             blocked = true;
-            System.out.println("Producer blocked at " + time);
+            blockedTimes.add(sim.currentTime());
+            message = "Blocked";
         } else {
-            time = time + productionTime();
-            destination.pushToQueue(sim, new Item(gen.getID()));
-            System.out.println("Producer pushed to destination at " + time);
+            time = sim.currentTime() + productionTime();
+            currentItem = new Item();
+            destination.pushToQueue(sim, currentItem);
+            message = "Pushed";
             sim.insert(this);
         }
     }

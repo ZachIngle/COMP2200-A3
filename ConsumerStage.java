@@ -1,25 +1,32 @@
 public class ConsumerStage extends Stage{
-    public ConsumerStage(int M, int N) {
-        super(M, N);
+    private int totalItemsConsumed = 0;
+
+    public ConsumerStage(String name, int M, int N) {
+        super(name, M, N);
+    }
+
+    public int getTotal() {
+        return totalItemsConsumed;
     }
 
     @Override
     public void execute(ProductionLineSimulator sim) {
-        if (currentItem == null && !starved) {
+        if (starved) return;
+
+        if (currentItem == null) {
             if (source.isEmpty()) {
-                time = sim.currentTime();
-                starvedTimes.add(time);
                 starved = true;
-                System.out.println("Consumer starved " + time);
+                starvedTimes.add(sim.currentTime());
+                message = "Starved";
             } else {
-                starved = false;
-                insertItem(sim, source.pollFromQueue(sim));
+                currentItem = source.pollFromQueue(sim);
+                time = sim.currentTime() + productionTime();
+                sim.insert(this);
             }
         } else {
-            System.out.println("Consumer finished working on item at " + time);
             currentItem = null;
-            starved = false;
-            System.out.println("Consumer consumed item!");
+            totalItemsConsumed++;
+            message = "Consumed!";
             sim.insert(this);
         }
     }

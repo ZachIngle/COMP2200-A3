@@ -1,5 +1,7 @@
 abstract class Event implements Comparable<Event> {
     protected double time = 0;
+    protected String name;
+    protected String message;
 
     abstract void execute(ProductionLineSimulator simulator);
 

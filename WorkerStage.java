@@ -1,7 +1,7 @@
 public class WorkerStage extends Stage {
    
-    public WorkerStage(int M, int N) {
-        super(M, N);
+    public WorkerStage(String name,int M, int N) {
+        super(name, M, N);
     }
 
     @Override

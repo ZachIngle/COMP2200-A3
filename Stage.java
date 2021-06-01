@@ -1,5 +1,6 @@
 import java.util.Random;
-import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 abstract class Stage extends Event {
     protected int avgProcessingTime;
@@ -9,15 +10,17 @@ abstract class Stage extends Event {
     protected Storage source;
     protected Storage destination;
 
-    protected ArrayList<Double> starvedTimes = new ArrayList<Double>();
-    protected ArrayList<Double> blockedTimes = new ArrayList<Double>();
-
     protected boolean starved = false;
     protected boolean blocked = false;
+    protected SortedSet<Double> starvedTimes = new TreeSet<Double>();
+    protected SortedSet<Double> unstarvedTimes = new TreeSet<Double>();
+    protected SortedSet<Double> blockedTimes = new TreeSet<Double>();
+    protected SortedSet<Double> unblockedTimes = new TreeSet<Double>();
 
-    private static Random r = new Random();
+    private static Random r = new Random(1);
 
-    public Stage(int avgProcessingTime, int rangeProcessingTime) {
+    public Stage(String name, int avgProcessingTime, int rangeProcessingTime) {
+        this.name = name;
         this.avgProcessingTime = avgProcessingTime;
         this.rangeProcessingTime = rangeProcessingTime;
     }
@@ -30,12 +33,21 @@ abstract class Stage extends Event {
         this.destination = destination;
     }
 
+    public void setStarved(boolean starved) {
+        this.starved = starved;
+    }
+
     public void setBlocked(boolean blocked) {
         this.blocked = blocked;
     }
 
-    public void setStarved(boolean starved) {
-        this.starved = starved;
+
+    public void addUnstarvedTime(double time) {
+        unstarvedTimes.add(time);
+    }
+
+    public void addUnblockedTime(double time) {
+        unblockedTimes.add(time);
     }
 
     public boolean isReady() {
@@ -50,17 +62,37 @@ abstract class Stage extends Event {
         return destination;
     }
 
-    public boolean getBlocked() {
+    public boolean isStarved() {
+        return starved;
+    }
+
+    public boolean isBlocked() {
         return blocked;
     }
 
-    public boolean getStarved() {
-        return starved;
+    public double getTotalTimeStarved() {
+        return 0;
+    }
+
+    public double getTotalTimeBlocked() {
+        int smallerSize = blockedTimes.size() < unblockedTimes.size() ? blockedTimes.size() : unblockedTimes.size();
+
+        Double[] blockedArray = blockedTimes.toArray(new Double[blockedTimes.size()]);
+        Double[] unblockedArray = unblockedTimes.toArray(new Double[unblockedTimes.size()]);
+
+        double total = 0;
+        for (int i = 0; i < smallerSize; i++) {
+            //System.out.println(unblockedArray[i] - blockedArray[i]);
+            total += unblockedArray[i] - blockedArray[i];
+        }
+
+        return total;
     }
 
     public void insertItem(ProductionLineSimulator sim, Item i) {
         currentItem = i;
         time = sim.currentTime() + productionTime();
+        message = "Worked on currentItem";
         sim.insert(this);
     }
 
