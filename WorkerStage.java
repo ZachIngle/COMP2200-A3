@@ -5,7 +5,10 @@ public class WorkerStage extends Stage {
     }
 
     @Override
-    public void execute(ProductionLineSimulator sim) {     
+    public void execute(ProductionLineSimulator sim) {    
+        if (starved) return;
+        if (blocked) return;
+        
         if (currentItem == null && !blocked) {
             time = sim.currentTime();
             starvedTimes.add(time);

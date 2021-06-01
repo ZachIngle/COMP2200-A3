@@ -22,9 +22,11 @@ public class ProductionLineSimulator {
     }
 
     public void insert(Event e) {
-        if (!events.contains(e)) {
-            events.add(e);
+        if (e.getTime() < time) {
+            e.setTime(time);
         }
+        assert e.getTime() >= time;
+        events.add(e);
     }
 
     public void start() {
@@ -46,8 +48,10 @@ public class ProductionLineSimulator {
 
         insert(S0);
         simulate();
-        System.out.println("Total items: " + S5.getTotal());
+        System.out.println("Total items created: " + S0.getTotalItemsCreated());
+        System.out.println("Total items consumed: " + S5.getTotalItemsConsumed());
         System.out.println("S0 total time blocked = " + S0.getTotalTimeBlocked());
+        System.out.println("S0 work " + S0.getWorkPercentage(timeLimit));
     }
 
     private void simulate() {

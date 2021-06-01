@@ -42,21 +42,21 @@ public class Storage {
 
         queue.add(i);
 
-        // Check destinations incase they are starved
-        for (Stage destination : destinations) {
-            if (destination.isStarved()) {
-                destination.setStarved(false);
-                destination.addUnstarvedTime(sim.currentTime());
-                sim.insert(destination);
-            }
-        }
-
         for (Stage destination : destinations) {
             if (destination.isReady()) {
                 sim.insert(destination);
                 //destination.insertItem(sim, i);
                 //System.out.println("Storage inserting into at " + sim.currentTime());
                 break;
+            }
+        }
+
+        // Check destinations incase they are starved
+        for (Stage destination : destinations) {
+            if (destination.isStarved()) {
+                destination.setStarved(false);
+                destination.addUnstarvedTime(sim.currentTime());
+                sim.insert(destination);
             }
         }
 
@@ -69,6 +69,7 @@ public class Storage {
             if (source.isBlocked()) {
                 source.setBlocked(false);
                 source.addUnblockedTime(sim.currentTime());
+                source.setTime(sim.currentTime());
                 sim.insert(source);
             }
         }

@@ -5,7 +5,7 @@ public class ConsumerStage extends Stage{
         super(name, M, N);
     }
 
-    public int getTotal() {
+    public int getTotalItemsConsumed() {
         return totalItemsConsumed;
     }
 
@@ -21,6 +21,7 @@ public class ConsumerStage extends Stage{
             } else {
                 currentItem = source.pollFromQueue(sim);
                 time = sim.currentTime() + productionTime();
+                message = "Worked!";
                 sim.insert(this);
             }
         } else {

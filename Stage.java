@@ -10,14 +10,14 @@ abstract class Stage extends Event {
     protected Storage source;
     protected Storage destination;
 
-    protected boolean starved = false;
+    protected boolean starved = true;
     protected boolean blocked = false;
     protected SortedSet<Double> starvedTimes = new TreeSet<Double>();
     protected SortedSet<Double> unstarvedTimes = new TreeSet<Double>();
     protected SortedSet<Double> blockedTimes = new TreeSet<Double>();
     protected SortedSet<Double> unblockedTimes = new TreeSet<Double>();
 
-    private static Random r = new Random(1);
+    private static Random r = new Random();
 
     public Stage(String name, int avgProcessingTime, int rangeProcessingTime) {
         this.name = name;
@@ -89,11 +89,8 @@ abstract class Stage extends Event {
         return total;
     }
 
-    public void insertItem(ProductionLineSimulator sim, Item i) {
-        currentItem = i;
-        time = sim.currentTime() + productionTime();
-        message = "Worked on currentItem";
-        sim.insert(this);
+    public double getWorkPercentage(double timeLimit) {
+        return 100 - (getTotalTimeStarved() + getTotalTimeBlocked() / timeLimit * 100);
     }
 
     protected double productionTime() {
