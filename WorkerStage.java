@@ -14,23 +14,19 @@ public class WorkerStage extends Stage {
             if (source.isEmpty()) {
                 starved = true;
                 starvedTimes.add(sim.currentTime());
-                message = "Starved";
             } else {
                 currentItem = source.pollFromQueue(sim);
                 currentItem.addMilestone(time, name, Item.Info.ENTERED);
                 time = sim.currentTime() + productionTime();
                 currentItem.addMilestone(time, name, Item.Info.WORKED);
-                message = "Worked!";
             }
         } else {
             if (destination.isFull()) {
                 blocked = true;
                 blockedTimes.add(sim.currentTime());
-                message = "Blocked";
             } else {
                 currentItem.addMilestone(time, name, Item.Info.LEFT);
                 destination.pushToQueue(sim, currentItem);
-                message = "Pushed";
                 currentItem = null;
             }
         }

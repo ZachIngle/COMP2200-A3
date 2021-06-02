@@ -1,36 +1,46 @@
+// ProductionLineSimulator.java
+// Author: Zachariah Ingle C3349554
+// Created: 30/5/2021
+// A class that simulates a production with a production line according
+// to A3 specifications.
+
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class ProductionLineSimulator {
     private double time = 0;
-    private final double timeLimit = 10000000; // 10000000
+    private final double timeLimit = 10000000; // 10,000,000
+    private int M; // Average processing time
+    private int N; // Range processing time
+    private int storageCapacity; // Capacity of storage queues
 
     private PriorityQueue<Event> events = new PriorityQueue<Event>();
 
-    private int M; // Average processing time
-    private int N; // Range processing time
-    private int storageCapacity;
-
+    // Constructor
     public ProductionLineSimulator(int M, int N, int QMax) {
         this.M = M;
         this.N = N;
         storageCapacity = QMax;
     }
     
+    // Get the current time
     public double currentTime() {
         return time;
     }
 
+    // Insert an event into the event queue
     public void insert(Event e) {
+        // Check to make sure event doesn't exist in queue already
         if (!events.contains(e)) {
+            // Ensure the event time is up to date
             if (e.getTime() < time) {
                 e.setTime(time);
             }
-            assert e.getTime() >= time;
-                events.add(e);
+            events.add(e);
         }
     }
 
+    // Main start method of the simulator
     public void start() {
         // Setup stages and storages
         // TODO: Probably implement factory?
@@ -48,8 +58,11 @@ public class ProductionLineSimulator {
         Storage Q45 = new Storage("Q45", storageCapacity);
         ConsumerStage S5 = new ConsumerStage("S5", M, N);
 
+        // Set up relationships between stages and storages
+        // S0
         S0.setDestination(Q01);
 
+        // Q01
         ArrayList<Stage> Q01Sources = new ArrayList<>();
         Q01Sources.add(S0);
         Q01.setSources(Q01Sources);
@@ -58,9 +71,11 @@ public class ProductionLineSimulator {
         Q01Destinations.add(S1);
         Q01.setDestinations(Q01Destinations);
 
+        // S1
         S1.setSource(Q01);
         S1.setDestination(Q12);
 
+        // Q12
         ArrayList<Stage> Q12Sources = new ArrayList<>();
         Q12Sources.add(S1);
         Q12.setSources(Q12Sources);
@@ -70,12 +85,15 @@ public class ProductionLineSimulator {
         Q12Destinations.add(S2b);
         Q12.setDestinations(Q12Destinations);
 
+        // S2a
         S2a.setSource(Q12);
         S2a.setDestination(Q23);
 
+        // S2b
         S2b.setSource(Q12);
         S2b.setDestination(Q23);
 
+        // Q23
         ArrayList<Stage> Q23Sources = new ArrayList<>();
         Q23Sources.add(S2a);
         Q23Sources.add(S2b);
@@ -85,9 +103,11 @@ public class ProductionLineSimulator {
         Q23Destinations.add(S3);
         Q23.setDestinations(Q23Destinations);
 
+        // S3
         S3.setSource(Q23);
         S3.setDestination(Q34);
 
+        // Q34
         ArrayList<Stage> Q34Sources = new ArrayList<>();
         Q34Sources.add(S3);
         Q34.setSources(Q34Sources);
@@ -97,12 +117,15 @@ public class ProductionLineSimulator {
         Q34Destinations.add(S4b);
         Q34.setDestinations(Q34Destinations);
 
+        // S4a
         S4a.setSource(Q34);
         S4a.setDestination(Q45);
 
+        // S4b
         S4b.setSource(Q34);
         S4b.setDestination(Q45);
 
+        // Q45
         ArrayList<Stage> Q45Sources = new ArrayList<>();
         Q45Sources.add(S4a);
         Q45Sources.add(S4b);
@@ -112,12 +135,17 @@ public class ProductionLineSimulator {
         Q45Destinations.add(S5);
         Q45.setDestinations(Q45Destinations);
 
+        // S5
         S5.setSource(Q45);
 
+        // Insert producer for first event
         insert(S0);
+        // Start simulations loop
         simulate();
+
+        // Print out statistics of run
         System.out.println("Total items created: " + S0.getTotalItemsCreated());
-        System.out.println("Total items consumed: " + S5.getFinishedItems().size());
+        System.out.println("Total items finished: " + S5.getFinishedItems().size());
         System.out.println();
         System.out.println("Production Stations");
         System.out.println("--------------------------------------------");
@@ -134,13 +162,14 @@ public class ProductionLineSimulator {
         System.out.println();
         System.out.println("Storage Queues");
         System.out.println("--------------------------------------------");
-        System.out.format("%5s %11s %3s%n", "Store", "AvgTime[t]", "AvgItems");
-        System.out.format("Q01   %11.2f %3.2f%n", Q01.getAverageTime(), Q01.getAverageItems());
-        System.out.format("Q12   %11.2f %3.2f%n", Q12.getAverageTime(), Q12.getAverageItems());
-        System.out.format("Q23   %11.2f %3.2f%n", Q23.getAverageTime(), Q23.getAverageItems());
-        System.out.format("Q34   %11.2f %3.2f%n", Q34.getAverageTime(), Q34.getAverageItems());
-        System.out.format("Q45   %11.2f %3.2f%n", Q45.getAverageTime(), Q45.getAverageItems());
+        System.out.format("%5s %11s %s%n", "Store", "AvgTime[t]", "AvgItems");
+        System.out.format("%-5s %11.2f %8.2f%n", Q01.getName(), Q01.getAverageTime(), Q01.getAverageItems());
+        System.out.format("%-5s %11.2f %8.2f%n", Q12.getName(), Q12.getAverageTime(), Q12.getAverageItems());
+        System.out.format("%-5s %11.2f %8.2f%n", Q23.getName(), Q23.getAverageTime(), Q23.getAverageItems());
+        System.out.format("%-5s %11.2f %8.2f%n", Q34.getName(), Q34.getAverageTime(), Q34.getAverageItems());
+        System.out.format("%-5s %11.2f %8.2f%n", Q45.getName(), Q45.getAverageTime(), Q45.getAverageItems());
 
+        // Find paths of finished items
         ArrayList<Item> finishedItems = S5.getFinishedItems();
         int S2AS4ACount = 0;
         int S2AS4BCount = 0;
@@ -171,14 +200,14 @@ public class ProductionLineSimulator {
         System.out.println("S2a -> S4b: " + S2AS4BCount);
         System.out.println("S2b -> S4a: " + S2BS4ACount);
         System.out.println("S2b -> S4b: " + S2BS4BCount);
-        
     }
 
+    // Simulation loop method
+    // Loops until we have no events or time reaches the time limit
     private void simulate() {
         Event e;
         while ((e = events.poll()) != null && time < timeLimit) {
             time = e.getTime();
-            //System.out.format("[%8.0f] %3s: %s\n", time, e.name, e.message);
             e.execute(this);
         }
     }

@@ -1,6 +1,9 @@
 public class PA3 {
     public static void main(String[] args) {
-        ProductionLineSimulator simulator = new ProductionLineSimulator(1000, 1000, 7);
-        simulator.start();
+        int M = Integer.parseInt(args[0]);
+        int N = Integer.parseInt(args[1]);
+        int QMax = Integer.parseInt(args[2]);
+
+        new ProductionLineSimulator(M, N, QMax).start();
     }
 }

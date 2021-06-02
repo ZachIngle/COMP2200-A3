@@ -73,14 +73,13 @@ abstract class Stage extends Event {
 
     public double getTotalTimeStarved() {
         if (starvedTimes.size() == 0) return 0;
-        int smallerSize = starvedTimes.size() < unstarvedTimes.size() ? starvedTimes.size() : unstarvedTimes.size();
+        int smallerSize = starvedTimes.size() > unstarvedTimes.size() ? unstarvedTimes.size() : starvedTimes.size();
 
         Double[] starvedArray = starvedTimes.toArray(new Double[starvedTimes.size()]);
         Double[] unstarvedArray = unstarvedTimes.toArray(new Double[unstarvedTimes.size()]);
 
         double total = 0;
         for (int i = 0; i < smallerSize; i++) {
-            //System.out.println(starvedArray[i] - unstarvedArray[i]);
             total += unstarvedArray[i] - starvedArray[i];
         }
 
@@ -89,14 +88,13 @@ abstract class Stage extends Event {
 
     public double getTotalTimeBlocked() {
         if (blockedTimes.size() == 0) return 0;
-        int smallerSize = blockedTimes.size() < unblockedTimes.size() ? blockedTimes.size() : unblockedTimes.size();
+        int smallerSize = blockedTimes.size() > unblockedTimes.size() ? unblockedTimes.size() : blockedTimes.size();
 
         Double[] blockedArray = blockedTimes.toArray(new Double[blockedTimes.size()]);
         Double[] unblockedArray = unblockedTimes.toArray(new Double[unblockedTimes.size()]);
 
         double total = 0;
         for (int i = 0; i < smallerSize; i++) {
-            //System.out.println(unblockedArray[i] - blockedArray[i]);
             total += unblockedArray[i] - blockedArray[i];
         }
 

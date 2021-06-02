@@ -16,17 +16,14 @@ public class ProducerStage extends Stage {
         if (destination.isFull()) {
             blocked = true;
             blockedTimes.add(sim.currentTime());
-            message = "Blocked";
         } else if (currentItem == null) {
             time = sim.currentTime() + productionTime();
             currentItem = new Item();
             currentItem.addMilestone(time, name, Item.Info.CREATED);
-            message = "Created new item";
             totalItemsCreated++;
         } else {
             currentItem.addMilestone(time, name, Item.Info.LEFT);
             destination.pushToQueue(sim, currentItem);
-            message = "Pushed";
             currentItem = null;
         }
 

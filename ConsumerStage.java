@@ -20,19 +20,16 @@ public class ConsumerStage extends Stage{
             if (source.isEmpty()) {
                 starved = true;
                 starvedTimes.add(sim.currentTime());
-                message = "Starved";
             } else {
                 currentItem = source.pollFromQueue(sim);
                 currentItem.addMilestone(time, name, Item.Info.ENTERED);
                 time = sim.currentTime() + productionTime();
                 currentItem.addMilestone(time, name, Item.Info.WORKED);
-                message = "Worked!";
             }
         } else {
             currentItem.addMilestone(time, name, Item.Info.LEFT);
             finishedItems.add(currentItem);
             currentItem = null;
-            message = "Consumed!";
         }
 
         sim.insert(this);

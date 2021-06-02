@@ -1,17 +1,24 @@
-import java.util.LinkedList;
+// Storage.java
+// Author: Zachariah Ingle C3349554
+// Created: 30/5/2021
+// A class that can hold items in a queue. Notifies blocked or
+// starved stages when the queue is updated.
+
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.LinkedList;
 import java.util.HashMap;
 
 public class Storage {
-    private String name;
+    private String name; // Name of the storage
 
-    private ArrayList<Stage> sources;
-    private ArrayList<Stage> destinations;
+    private ArrayList<Stage> sources; // The source stages
+    private ArrayList<Stage> destinations; // The destination stages
 
     private final int maxQueueSize;
     private Queue<Item> queue = new LinkedList<>();
 
+    // Statistics 
     private HashMap<String, Double> ItemEntryTimes = new HashMap<>();
     private HashMap<String, Double> ItemRemovalTimes = new HashMap<>();
     private ArrayList<Integer> QueueSizes = new ArrayList<>();
@@ -33,6 +40,10 @@ public class Storage {
 
     public void setDestinations(ArrayList<Stage> destinations) {
         this.destinations = destinations;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isEmpty() {
@@ -76,8 +87,6 @@ public class Storage {
         for (Stage destination : destinations) {
             if (destination.isReady()) {
                 sim.insert(destination);
-                //destination.insertItem(sim, i);
-                //System.out.println("Storage inserting into at " + sim.currentTime());
                 break;
             }
         }
@@ -90,8 +99,6 @@ public class Storage {
                 sim.insert(destination);
             }
         }
-
-        //System.out.println("Item added to queue. Queue size " + queue.size());
     }
 
     public Item pollFromQueue(ProductionLineSimulator sim) {
@@ -106,7 +113,6 @@ public class Storage {
             }
         }
 
-        //System.out.println("Item removed from queue. Queue size " + (queue.size() - 1));
         Item removedItem = queue.poll();
         removedItem.addMilestone(sim.currentTime(), name, Item.Info.LEFT);
         ItemRemovalTimes.put(removedItem.getID(), sim.currentTime());
