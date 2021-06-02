@@ -15,25 +15,21 @@ public class Storage {
     private ArrayList<Stage> sources; // The source stages
     private ArrayList<Stage> destinations; // The destination stages
 
-    private final int maxQueueSize;
-    private Queue<Item> queue = new LinkedList<>();
+    private final int maxQueueSize; // The max queue size a storage can have
+    private Queue<Item> queue = new LinkedList<>(); // The queue which stores items
 
     // Statistics 
     private HashMap<String, Double> ItemEntryTimes = new HashMap<>();
     private HashMap<String, Double> ItemRemovalTimes = new HashMap<>();
     private ArrayList<Integer> QueueSizes = new ArrayList<>();
 
+    // Constructor
     public Storage(String name, int storageCapacity) {
         this.name = name;
         maxQueueSize = storageCapacity;
     }
 
-    public Storage(ArrayList<Stage> sources, ArrayList<Stage> destinations, int storageCapacity) {
-        this.sources = sources;
-        this.destinations = destinations;
-        maxQueueSize = storageCapacity;
-    }
-
+    // Mutators
     public void setSources(ArrayList<Stage> sources) {
         this.sources = sources;
     }
@@ -42,10 +38,12 @@ public class Storage {
         this.destinations = destinations;
     }
 
+    // Accessors
     public String getName() {
         return name;
     }
 
+    // Queue queries
     public boolean isEmpty() {
         return queue.isEmpty();
     }
@@ -54,38 +52,17 @@ public class Storage {
         return queue.size() == maxQueueSize;
     }
 
-    public double getAverageTime() {
-        double total = 0;
-        for (HashMap.Entry<String, Double> entry : ItemEntryTimes.entrySet()) {
-            if (!ItemRemovalTimes.containsKey(entry.getKey())) break;
-            double removalTime = ItemRemovalTimes.get(entry.getKey());
-            total += removalTime - entry.getValue();
-        }
-
-        return total / ItemEntryTimes.size();
-    }
-
-    public double getAverageItems() {
-        double total = 0;
-        for (Integer size : QueueSizes) {
-            total += size;
-        }
-
-        return total / QueueSizes.size();
-    }
-
+    // Adding to the queue
     public void pushToQueue(ProductionLineSimulator sim, Item i) {
-        QueueSizes.add(queue.size());
-        if (isFull()) {
-            return;
-        }
-
         queue.add(i);
         i.addMilestone(sim.currentTime(), name, Item.Info.QUEUED);
         ItemEntryTimes.put(i.getID(), sim.currentTime());
+        QueueSizes.add(queue.size());
 
         for (Stage destination : destinations) {
             if (destination.isReady()) {
+                // Update destination time
+                destination.setTime(sim.currentTime());
                 sim.insert(destination);
                 break;
             }
@@ -101,6 +78,7 @@ public class Storage {
         }
     }
 
+    // Removing fromt the queue
     public Item pollFromQueue(ProductionLineSimulator sim) {
         QueueSizes.add(queue.size());
         // Check sources incase they are blocked
@@ -108,7 +86,7 @@ public class Storage {
             if (source.isBlocked()) {
                 source.setBlocked(false);
                 source.addUnblockedTime(sim.currentTime());
-                source.setTime(sim.currentTime());
+                source.setTime(sim.currentTime()); // Make sure source time is up to date
                 sim.insert(source);
             }
         }
@@ -117,5 +95,28 @@ public class Storage {
         removedItem.addMilestone(sim.currentTime(), name, Item.Info.LEFT);
         ItemRemovalTimes.put(removedItem.getID(), sim.currentTime());
         return removedItem;
+    }
+
+    // Statistics
+    // Calculate the average time an item stays in the queue
+    public double getAverageTime() {
+        double total = 0;
+        for (HashMap.Entry<String, Double> entry : ItemEntryTimes.entrySet()) {
+            if (!ItemRemovalTimes.containsKey(entry.getKey())) break;
+            double removalTime = ItemRemovalTimes.get(entry.getKey());
+            total += removalTime - entry.getValue();
+        }
+
+        return total / ItemEntryTimes.size();
+    }
+
+    // Calculate the average items at any time in the queue
+    public double getAverageItems() {
+        double total = 0;
+        for (Integer size : QueueSizes) {
+            total += size;
+        }
+
+        return total / QueueSizes.size();
     }
 }

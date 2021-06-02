@@ -32,10 +32,6 @@ public class ProductionLineSimulator {
     public void insert(Event e) {
         // Check to make sure event doesn't exist in queue already
         if (!events.contains(e)) {
-            // Ensure the event time is up to date
-            if (e.getTime() < time) {
-                e.setTime(time);
-            }
             events.add(e);
         }
     }

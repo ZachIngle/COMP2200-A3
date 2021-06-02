@@ -10,11 +10,12 @@ abstract class Event implements Comparable<Event> {
     // Execute method that specifies what will happen in the event
     abstract void execute(ProductionLineSimulator simulator);
 
-    // Setter/getter
+    // Mutator
     public void setTime(double time) {
         this.time = time;
     }
 
+    // Accessor
     public double getTime() {
         return time;
     }
