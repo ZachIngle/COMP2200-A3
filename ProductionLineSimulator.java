@@ -12,7 +12,7 @@ public class ProductionLineSimulator {
     private final double timeLimit = 10000000; // 10,000,000
     private int M; // Average processing time
     private int N; // Range processing time
-    private int storageCapacity; // Capacity of storage queues
+    private int QMax; // Capacity of storage queues
 
     private PriorityQueue<Event> events = new PriorityQueue<Event>();
 
@@ -20,7 +20,7 @@ public class ProductionLineSimulator {
     public ProductionLineSimulator(int M, int N, int QMax) {
         this.M = M;
         this.N = N;
-        storageCapacity = QMax;
+        this.QMax = QMax;
     }
     
     // Get the current time
@@ -39,20 +39,20 @@ public class ProductionLineSimulator {
     // Main start method of the simulator
     public void start() {
         // Setup stages and storages
-        // TODO: Probably implement factory?
-        ProducerStage S0 = new ProducerStage("S0", M, N);
-        Storage Q01 = new Storage("Q01", storageCapacity);
-        WorkerStage S1 = new WorkerStage("S1", M, N);
-        Storage Q12 = new Storage("Q12", storageCapacity);
-        WorkerStage S2a = new WorkerStage("S2a", 2 * M, 2 * N);
-        WorkerStage S2b = new WorkerStage("S2b", 2 * M, 2 * N);
-        Storage Q23 = new Storage("Q23", storageCapacity);
-        WorkerStage S3 = new WorkerStage("S3", M, N);
-        Storage Q34 = new Storage("Q34", storageCapacity);
-        WorkerStage S4a = new WorkerStage("S4a", 2 * M, 2 * N);
-        WorkerStage S4b = new WorkerStage("S4b", 2 * M, 2 * N);
-        Storage Q45 = new Storage("Q45", storageCapacity);
-        ConsumerStage S5 = new ConsumerStage("S5", M, N);
+        StageFactory stageFactory = new StageFactory();
+        ProducerStage S0 = (ProducerStage) stageFactory.createStage("Producer", "S0", M, N);
+        Storage Q01 = new Storage("Q01", QMax);
+        WorkerStage S1 = (WorkerStage) stageFactory.createStage("Worker", "S1", M, N);
+        Storage Q12 = new Storage("Q12", QMax);
+        WorkerStage S2a = (WorkerStage) stageFactory.createStage("Worker", "S2a", 2 * M, 2 * N);
+        WorkerStage S2b = (WorkerStage) stageFactory.createStage("Worker", "S2b", 2 * M, 2 * N);
+        Storage Q23 = new Storage("Q23", QMax);
+        WorkerStage S3 = (WorkerStage) stageFactory.createStage("Worker", "S3", M, N);
+        Storage Q34 = new Storage("Q34", QMax);
+        WorkerStage S4a = (WorkerStage) stageFactory.createStage("Worker", "S4a", 2 * M, 2 * N);
+        WorkerStage S4b = (WorkerStage) stageFactory.createStage("Worker", "S4b", 2 * M, 2 * N);
+        Storage Q45 = new Storage("Q45", QMax);
+        ConsumerStage S5 = (ConsumerStage) stageFactory.createStage("Consumer", "S5", M, N);
 
         // Set up relationships between stages and storages
         // S0

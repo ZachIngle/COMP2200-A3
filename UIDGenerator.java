@@ -9,8 +9,8 @@ public class UIDGenerator {
     private static UIDGenerator instance = new UIDGenerator();
 
     private static ArrayList<String> IDList = new ArrayList<String>();
-    private static String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static int IDLength = 16;
+    private static final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int IDLength = 16;
     private static Random gen = new Random();
 
     private UIDGenerator() {}
